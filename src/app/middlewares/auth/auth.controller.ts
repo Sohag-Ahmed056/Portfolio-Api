@@ -2,21 +2,16 @@ import type { NextFunction, Request, Response } from "express";
 import catchAsync from "../../shared/catchAsync.js";
 import { AuthService } from "./auth.service.js";
 import sendResponse from "../../shared/sendResponse.js";
-import ApiError from "../../errors/ApiError.js";
-import { jwtHelper } from "../../helper/jwtHelper.js";
+
+
 
 
 const userLogin = catchAsync(async(req:Request, res:Response)=>{
 
     const result= await AuthService.login(req.body)
-    res.cookie("authToken",result.token,{
-        httpOnly:true,
-        secure: true,
-        sameSite: "lax",
-    })
-        console.log("token",result.token);
 
-    sendResponse(res,{
+   
+         sendResponse(res,{
 
         statusCode:201,
         success:true,
@@ -25,33 +20,35 @@ const userLogin = catchAsync(async(req:Request, res:Response)=>{
 
     })
 
+       
+});
         
 
 
 
-})
-
-const logOutUser = catchAsync(async(req:Request, res:Response)=>{
-
-    res.clearCookie("authToken",{
-        httpOnly:true,
-        secure: true,
-        sameSite: "lax",
-    })
 
 
-     sendResponse(res,{
+// const logOutUser = catchAsync(async(req:Request, res:Response)=>{
 
-        statusCode:201,
-        success:true,
-        message:"user logged out successfully",
-        data: null
+//     res.clearCookie("authToken",{
+//         httpOnly:true,
+//         secure:false,
+//         sameSite: "lax",
+//     })
 
-    })
+
+//      sendResponse(res,{
+
+//         statusCode:201,
+//         success:true,
+//         message:"user logged out successfully",
+//         data: null
+
+//     })
 
    
 
-})
+// })
 
 // const userChangePassword = catchAsync(async(req:Request, res:Response)=>{
 
@@ -68,38 +65,35 @@ const logOutUser = catchAsync(async(req:Request, res:Response)=>{
 // })
 
 
-const requireAuth = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
+// const requireAuth = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
 
-    const authToken = req.cookies.authToken;
-    console.log("authToken",authToken);
+//     const authToken = req.cookies.authToken || req.cookies.next-auth.session-token;
+//     console.log("authToken",authToken);
 
-    if(!authToken){
-        throw new ApiError(401, "Unauthorized")
-    }
+//     if(!authToken){
+//         throw new ApiError(401, "Unauthorized")
+//     }
 
-    const verifiedPayload = jwtHelper.verifyToken(authToken,"mysecret")
+//     const verifiedPayload = jwtHelper.verifyToken(authToken,"mysecret")
 
-    req.user = verifiedPayload;
+//     req.user = verifiedPayload;
 
-    next();
+//     next();
 
-})
+// })
 
-const requireOwner = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
+// const requireOwner = catchAsync(async(req:Request, res:Response, next:NextFunction)=>{
 
-    if(req.user?.role !== 'OWNER'){
-        throw new ApiError(403, "Forbidden")
-    }
+//     if(req.user?.role !== 'OWNER'){
+//         throw new ApiError(403, "Forbidden")
+//     }
 
-    next();
+//     next();
 
-})
+// })
 
 
 export const AuthController= {
     userLogin,
-    requireAuth,
-    requireOwner,
-    logOutUser
     
 }

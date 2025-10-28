@@ -96,9 +96,95 @@ const getAllBlogs = async (options:GetAllBlogsOptions) => {
   };
 }
 
+
+
+const getBlogById = async (id: number) => {
+  const blog = await prisma.blog.findUnique({
+    where: { id },
+    include: {
+      author: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  if (!blog) {
+    throw new ApiError(404, "Blog not found");
+  }
+
+  return blog;
+};
+
+
+
+
+export const getUserBlogsService = async (userId:any, options?: { page?: number; limit?: number }) => {
+  const { page = 1, limit = 10 } = options || {};
+  const skip = (page - 1) * limit;
+
+  // find blogs created by this user
+  const [blogs, total] = await prisma.$transaction([
+    prisma.blog.findMany({
+      where: { authorId: userId },
+      skip,
+      take: limit,
+      include: {
+        author: {
+          select: { id: true, name: true, email: true, role: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.blog.count({ where: { authorId: userId } }),
+  ]);
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    data: blogs,
+    meta: { total, page, limit, totalPages },
+  };
+};
+
+
+
+const deleteBlog = async (blogId:any) => {
+
+  
+  const findID = Number(blogId);
+
+  
+
+    const blog = await prisma.blog.findUnique({
+        where:{
+            id:findID
+        }
+    });
+
+    if(!blog){
+        throw new ApiError(404, "Blog not found");
+    }
+
+    await prisma.blog.delete({
+        where:{
+            id:findID
+        }
+    });
+
+    return;
+}
+
 export const BlogService={
     createBlog,
-    getAllBlogs
+    getAllBlogs,
+    deleteBlog,
+    getUserBlogsService,
+    getBlogById
 };
 
 

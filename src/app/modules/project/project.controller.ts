@@ -20,6 +20,44 @@ const createProject = catchAsync(async(req:Request, res:Response)=>{
 
 })
 
+
+
+const deleteProject = catchAsync(async (req: Request, res: Response) => {
+ // from frontend
+  const blogId = req.params.id;
+  const Id = Number(blogId)
+
+  
+
+  await ProjectService.deleteProject(Id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Blog deleted successfully!",
+    data: null,
+  });
+});
+
+const getALLProject= catchAsync(async(req:Request,res:Response)=>{
+
+    const projects = await ProjectService.getALLProject()
+
+    sendResponse(res,{
+
+        statusCode: 201,
+        success:true,
+        message: "all projects successfully get",
+        data: projects
+    })
+
+
+
+
+})
+
 export const ProjectController={
-    createProject
+    createProject,
+    getALLProject,
+    deleteProject
 };

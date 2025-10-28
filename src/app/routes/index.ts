@@ -8,7 +8,6 @@ import { resumeRoute } from '../modules/resume/resume.route.js';
 export const createApiRouter = (): Router => {
   const router = Router();
 
-  // Array of objects with path and router
   const routes: { path: string; router: Router }[] = [
     { path: 'user', router: userRoute },
     {  path:'auth', router: authRoute},
@@ -19,7 +18,6 @@ export const createApiRouter = (): Router => {
   ];
   
 
-  // Dynamically attach each router
   routes.map(r => {
     router.use(`/${r.path}`, r.router);
     

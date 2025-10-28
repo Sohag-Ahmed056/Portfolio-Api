@@ -4,4 +4,4 @@ import { ResumeController } from "./resume.controller.js";
 
 
 export const resumeRoute = Router();
-resumeRoute.post('/create',AuthController.requireAuth, ResumeController.createResume);
+resumeRoute.post('/create', ResumeController.createResume);

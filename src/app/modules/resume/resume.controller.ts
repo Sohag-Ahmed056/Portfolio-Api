@@ -5,31 +5,30 @@ import { ResumeService } from "./resume.service.js";
 import ApiError from "../../errors/ApiError.js";
 
 const createResume = catchAsync(async (req: Request, res: Response) => {
-    const userId = req.user.id;
-    console.log('User ID:', userId); 
-    
-    const resumeData = req.body;
-    console.log('Resume Data:', resumeData);
+  const { userId, ...resumeData } = req.body;
 
-    // Validate that required fields are present
-    if (!resumeData.name || !resumeData.email) {
-        
-        throw new ApiError(400, 'Name and email are required fields');
-    }
+  console.log("User ID:", userId);
+  console.log("Resume Data:", resumeData);
 
-    const resume = await ResumeService.createResume(resumeData, userId);
+  // Validate userId and essential fields
+  if (!userId) {
+    throw new ApiError(400, "User ID is required. Please send it from frontend.");
+  }
 
-    sendResponse(res, {
-        statusCode: 201,
-        success: true,
-        message: "Resume created successfully!",
-        data: {
-            resume,
-            // downloadLink
-        }
-    });
+  if (!resumeData.name || !resumeData.email) {
+    throw new ApiError(400, "Name and email are required fields.");
+  }
+
+  const resume = await ResumeService.createResume(resumeData, userId);
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "Resume created successfully!",
+    data: resume,
+  });
 });
 
 export const ResumeController = {
-    createResume
+  createResume,
 };

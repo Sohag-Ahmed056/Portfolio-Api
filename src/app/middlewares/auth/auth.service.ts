@@ -29,23 +29,15 @@ const login = async (payload: ILoginPayload) => {
         throw new ApiError(404, "invalid Password")
     }
 
-    const tokenPayload= {
-          id:user.id,
-        name:user.name,
-        email: user.email,
-        role: user.role
-    }
-
-
-    const token= jwtHelper.generateToken(tokenPayload,"mysecret","30d")
+    
 
     
 
 
     return {
         
-        user,
-        token
+        user
+        
 
     }
 
