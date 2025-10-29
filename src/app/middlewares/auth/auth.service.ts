@@ -2,7 +2,7 @@
 import bcrypt from "bcrypt"
 import { prisma } from "../../shared/prisma.js";
 import ApiError from "../../errors/ApiError.js";
-import { jwtHelper } from "../../helper/jwtHelper.js";
+
 
 interface ILoginPayload {
   email: string;

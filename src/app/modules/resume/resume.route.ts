@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { AuthController } from "../../middlewares/auth/auth.controller.js";
 import { ResumeController } from "./resume.controller.js";
 
 
