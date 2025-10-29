@@ -12,7 +12,7 @@ const startServer =async()=>{
 
     console.log("Server started and connected to the database.");
 
-    app.listen(5000,()=>{
+    app.listen(process.env.PORT,()=>{
         console.log("Server is running on http://localhost:5000");
     })
 }

@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Resume" ALTER COLUMN "title" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "role" SET DEFAULT 'USER';

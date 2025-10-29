@@ -18,7 +18,7 @@ model User {
   email     String   @unique
   password  String
   name      String?
-  role      UserRole @default(OWNER)
+  role      UserRole @default(USER)
   blogs     Blog[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
