@@ -65,7 +65,6 @@ const getMe = async (userId: any) => {
       name: true,
       email: true,
       role: true,
-      blogs: true,
       createdAt: true,
       updatedAt: true,
     },

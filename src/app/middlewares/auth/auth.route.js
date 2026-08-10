@@ -1,0 +1,5 @@
+import { Router } from "express";
+import { AuthController } from "./auth.controller.js";
+export const authRoute = Router();
+authRoute.post('/login', AuthController.userLogin);
+//# sourceMappingURL=auth.route.js.map
