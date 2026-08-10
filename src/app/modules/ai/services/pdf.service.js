@@ -1,7 +1,4 @@
 import fs from 'fs-extra';
-// @ts-ignore
-import * as pdfParseModule from 'pdf-parse';
-const pdfParse = pdfParseModule.default || pdfParseModule;
 import { aiConfig } from '../../../../config/ai.config.js';
 export class PdfService {
     /**
@@ -9,6 +6,10 @@ export class PdfService {
      */
     static async extractTextAndCleanup(filePath) {
         try {
+            // Dynamic import of pdf-parse to prevent top-level execution of pdfjs-dist on Vercel Node.js Serverless boot
+            // @ts-ignore
+            const pdfParseModule = await import('pdf-parse');
+            const pdfParse = pdfParseModule.default || pdfParseModule;
             const dataBuffer = await fs.readFile(filePath);
             const data = await pdfParse(dataBuffer);
             await fs.remove(filePath); // clean up
