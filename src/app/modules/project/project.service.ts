@@ -37,16 +37,52 @@ const deleteProject = async (projectId: number | string) => {
   return { message: "Project deleted successfully" };
 };
 
-const getALLProject = async()=>{
+const getSingleProject = async (projectId: number | string) => {
+  const id = Number(projectId);
+  const project = await prisma.project.findUnique({
+    where: { id },
+  });
 
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
 
-     const projects = await prisma.project. findMany()
+  return project;
+};
 
-     return projects;
-}
+const updateProject = async (projectId: number | string, projectData: Prisma.ProjectUpdateInput) => {
+  const id = Number(projectId);
 
- export const ProjectService = {
-    createProject,
-    getALLProject,
-    deleteProject
-};   
+  const existing = await prisma.project.findUnique({
+    where: { id },
+  });
+
+  if (!existing) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const updatedProject = await prisma.project.update({
+    where: { id },
+    data: {
+      ...projectData,
+    },
+  });
+
+  return updatedProject;
+};
+
+const getALLProject = async () => {
+  const projects = await prisma.project.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+
+  return projects;
+};
+
+export const ProjectService = {
+  createProject,
+  getALLProject,
+  getSingleProject,
+  updateProject,
+  deleteProject,
+};

@@ -1,14 +1,13 @@
 
 # 💻 Portfolio Backend
 
-This is the **backend server** for my personal portfolio project. It is built with **TypeScript**, **Express**, **Prisma**, and **JWT authentication**. It provides APIs for managing **users, blogs, projects, and resumes**.
+This is the **backend server** for my personal portfolio project. It is built with **TypeScript**, **Express**, **Prisma**, and **JWT authentication**. It provides APIs for managing **users, projects, and resumes**.
 
 ---
 
 ## 🚀 Features
 
 * 🔐 **JWT Authentication** – secure login and role-based access
-* 📝 **Blog Management** – create, update, delete, and fetch blogs
 * 💼 **Project Management** – CRUD operations for portfolio projects
 * 🧾 **Resume Management** – dynamic resume creation and retrieval
 * ⚡ **Type-safe Validation** – using Zod for request validation
@@ -40,7 +39,6 @@ src/
 │   ├── helper/              # Helper functions
 │   ├── middlewares/auth/    # Auth middlewares
 ├── modules/
-│   ├── blog/                # Blog CRUD logic
 │   ├── project/             # Project CRUD logic
 │   ├── resume/              # Resume CRUD logic
 │   └── user/                # User management
@@ -103,13 +101,6 @@ Server runs on **[http://localhost:5000](http://localhost:5000)**
 
 * `POST /api/auth/register` – Register a new user
 * `POST /api/auth/login` – Login and get JWT token
-
-### Blogs
-
-* `GET /api/blogs` – Get all blogs
-* `POST /api/blogs` – Create a new blog (admin only)
-* `PUT /api/blogs/:id` – Update a blog (admin only)
-* `DELETE /api/blogs/:id` – Delete a blog (admin only)
 
 ### Projects
 

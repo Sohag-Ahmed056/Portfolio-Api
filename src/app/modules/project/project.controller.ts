@@ -23,41 +23,85 @@ const createProject = catchAsync(async(req:Request, res:Response)=>{
 
 
 const deleteProject = catchAsync(async (req: Request, res: Response) => {
- // from frontend
-  const blogId = req.params.id;
-  const Id = Number(blogId)
-
-  
+  // from frontend
+  const projectId = req.params.id;
+  const Id = Number(projectId);
 
   await ProjectService.deleteProject(Id);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Blog deleted successfully!",
+    message: "Project deleted successfully!",
     data: null,
   });
 });
 
-const getALLProject= catchAsync(async(req:Request,res:Response)=>{
+const getSingleProject = catchAsync(async (req: Request, res: Response) => {
+  const projectId = req.params.id as string;
+  const project = await ProjectService.getSingleProject(projectId);
 
-    const projects = await ProjectService.getALLProject()
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Project details retrieved successfully!",
+    data: project,
+  });
+});
 
-    sendResponse(res,{
+const updateProject = catchAsync(async (req: Request, res: Response) => {
+  const projectId = req.params.id as string;
+  const projectData = req.body;
 
-        statusCode: 201,
-        success:true,
-        message: "all projects successfully get",
-        data: projects
-    })
+  const updatedProject = await ProjectService.updateProject(projectId, projectData);
 
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Project updated successfully!",
+    data: updatedProject,
+  });
+});
 
+const getALLProject = catchAsync(async (req: Request, res: Response) => {
+  const projects = await ProjectService.getALLProject();
 
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "All projects retrieved successfully",
+    data: projects,
+  });
+});
 
-})
+import ApiError from "../../errors/ApiError.js";
 
-export const ProjectController={
-    createProject,
-    getALLProject,
-    deleteProject
+const uploadImage = catchAsync(async (req: Request, res: Response) => {
+  if (!req.file) {
+    throw new ApiError(400, "No image file provided");
+  }
+
+  const host = req.get("host") || "localhost:5000";
+  const protocol = req.protocol || "http";
+  const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Image uploaded successfully!",
+    data: {
+      url: imageUrl,
+      path: `/uploads/${req.file.filename}`,
+      filename: req.file.filename,
+    },
+  });
+});
+
+export const ProjectController = {
+  createProject,
+  getALLProject,
+  getSingleProject,
+  updateProject,
+  deleteProject,
+  uploadImage,
 };
