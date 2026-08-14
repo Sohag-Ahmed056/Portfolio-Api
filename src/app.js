@@ -27,8 +27,21 @@ export const app = express();
 // Increase Express body parser limit to 50mb for large uploads / base64 payloads
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://sohag-dev.vercel.app',
+    process.env.FRONTEND_URL,
+].filter(Boolean);
 app.use(cors({
-    origin: "http://localhost:3000", // frontend origin
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+            callback(null, true);
+        }
+        else {
+            callback(null, true);
+        }
+    },
     credentials: true,
 }));
 // Serve uploaded images statically
