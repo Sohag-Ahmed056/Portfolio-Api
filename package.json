@@ -11,7 +11,8 @@
     "seed:pdf": "tsx src/scripts/seed_pdf.ts",
     "postinstall": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:uploads": "node --import tsx tests/imageUpload.test.ts"
+    "test:uploads": "node --import tsx tests/imageUpload.test.ts",
+    "test:chat": "node --import tsx tests/chat.test.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

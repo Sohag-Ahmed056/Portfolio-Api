@@ -6,6 +6,7 @@ import { GeminiService } from './services/gemini.service.js';
 import type { IChatRequest, IStructuredResponse } from './ai.interface.js';
 import { IntentService } from './services/intent.service.js';
 import { prisma } from '../../shared/prisma.js';
+import ApiError from '../../errors/ApiError.js';
 
 export class AiController {
   /**
@@ -55,15 +56,41 @@ export class AiController {
    */
   static async chat(req: Request, res: Response): Promise<void> {
     try {
-      const { message, history } = req.body as IChatRequest;
+      const body = req.body as IChatRequest | undefined;
+      const message = typeof body?.message === 'string' ? body.message.trim() : '';
+      const history = body?.history ?? [];
 
       if (!message) {
         res.status(400).json({ success: false, message: 'Message is required.' });
         return;
       }
 
+      if (!Array.isArray(history) || history.some(item =>
+        !item || (item.role !== 'user' && item.role !== 'assistant') || typeof item.content !== 'string')) {
+        res.status(400).json({ success: false, message: 'History must contain user or assistant messages with text content.' });
+        return;
+      }
+      const recentHistory = history.filter(item => item.content.trim()).slice(-20);
+
       // Retrieve relevant chunks
-      const relevantChunks = await RetrievalService.getRelevantChunks(message);
+      // Every answer needs current portfolio facts, including summaries and follow-ups.
+      const [relevantChunks, activeResume, projects] = await Promise.all([
+        RetrievalService.getRelevantChunks(message, recentHistory),
+        prisma.resume.findFirst({
+          orderBy: { createdAt: 'desc' },
+          select: {
+            name: true, title: true, email: true, phone: true, github: true,
+            skills: true, education: true, projects: true, certifications: true, experience: true,
+          },
+        }),
+        prisma.project.findMany({
+          orderBy: { createdAt: 'desc' },
+          select: {
+            id: true, title: true, slug: true, description: true, technologies: true,
+            features: true, challenges: true, thumbnail: true, liveUrl: true, repoUrl: true,
+          },
+        }),
+      ]);
 
       // Detect intent
       const intent = IntentService.detectIntent(message);
@@ -72,14 +99,7 @@ export class AiController {
       let data: Record<string, any> = {};
 
       if (intent !== 'text') {
-        const activeResume = await prisma.resume.findFirst({
-          orderBy: { createdAt: 'desc' },
-        });
-
         if (intent === 'project' || intent === 'multiple') {
-          const projects = await prisma.project.findMany({
-            orderBy: { createdAt: 'desc' },
-          });
           data.projects = projects.length > 0 ? projects : activeResume?.projects || [];
         }
 
@@ -125,7 +145,11 @@ export class AiController {
       }
 
       // Query Gemini
-      const answer = await GeminiService.askQuestion(message, relevantChunks, history);
+      const portfolioContext = JSON.stringify({
+        profile: activeResume,
+        projects: projects.length > 0 ? projects : activeResume?.projects || [],
+      });
+      const answer = await GeminiService.askQuestion(message, relevantChunks, recentHistory, portfolioContext);
 
       const responsePayload: IStructuredResponse = {
         success: true,
@@ -137,7 +161,7 @@ export class AiController {
       res.status(200).json(responsePayload);
     } catch (error: any) {
       console.error('Chat Error:', error);
-      res.status(500).json({
+      res.status(error instanceof ApiError ? error.statusCode : 500).json({
         success: false,
         message: error.message || 'An error occurred during chat.',
       });

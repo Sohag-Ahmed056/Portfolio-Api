@@ -136,6 +136,7 @@ npm run dev       # Start dev server with tsx watch
 npm run build     # Compile TypeScript into dist/
 npm start         # Start compiled JS server
 npm run test:uploads # Verify image upload and retrieval behavior
+npm run test:chat  # Verify portfolio answers, conversation history, and API errors
 ```
 
 For production, run `npm run build` before `npm start`. Generated JavaScript stays
@@ -158,5 +159,12 @@ in the `image` field (maximum 4 MB). The response includes `data.url`, `data.pat
 and `data.filename`. Fetch the URL to retrieve the stored image. Existing files
 in `uploads/` remain accessible at their original paths.
 
----
+### Portfolio chatbot
 
+The frontend chat widget calls `POST /api/v1/ai/chat` with `message` and optional
+`history` (`user`/`assistant` messages). Replies use the latest resume, projects,
+and relevant uploaded knowledge, including for summaries and follow-up questions.
+Configure `GEMINI_API_KEY` and `CHAT_MODEL` on the backend, and set the frontend's
+`NEXT_PUBLIC_BASE_API` to the backend URL. Redeploy both projects after chat changes.
+
+---
