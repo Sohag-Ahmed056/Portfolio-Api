@@ -17,4 +17,9 @@ const startServer =async()=>{
     })
 }
 
-startServer();
+// Vercel invokes the exported Express handler; local development starts a listener.
+export default app;
+
+if (!process.env.VERCEL) {
+    startServer();
+}

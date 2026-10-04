@@ -135,6 +135,7 @@ Authorization: Bearer <your-token>
 npm run dev       # Start dev server with tsx watch
 npm run build     # Compile TypeScript into dist/
 npm start         # Start compiled JS server
+npm run test:uploads # Verify image upload and retrieval behavior
 ```
 
 For production, run `npm run build` before `npm start`. Generated JavaScript stays
@@ -142,6 +143,20 @@ in `dist/`, keeping `src/` for TypeScript source. The Prisma configuration remai
 in `prisma.config.ts`; Prisma loads it directly. Run `npm run seed:pdf` to regenerate
 the profile PDF and seed the knowledge base.
 
----
+### Image uploads on Vercel
 
+Project images are stored as binary data in PostgreSQL, so they survive redeploys
+and do not require a writable application filesystem or another storage service.
+Apply the migration before deploying this version:
+
+```bash
+npx prisma migrate deploy
+```
+
+Send `multipart/form-data` to `POST /api/v1/project/upload-image` with one file
+in the `image` field (maximum 4 MB). The response includes `data.url`, `data.path`,
+and `data.filename`. Fetch the URL to retrieve the stored image. Existing files
+in `uploads/` remain accessible at their original paths.
+
+---
 

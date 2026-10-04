@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from "cookie-parser";
 import { createApiRouter } from './app/routes/index.js';
 import path from 'path';
+import { errorHandler } from './app/middlewares/error.middleware.js';
 
 // Polyfills for browser globals required by pdfjs-dist on Node.js / Vercel Serverless Function
 if (typeof (globalThis as any).DOMMatrix === 'undefined') {
@@ -51,3 +52,5 @@ app.use(cookieParser());
 app.get('/', (req, res) => {
     res.send('Hello, World!');
 });
+
+app.use(errorHandler);
