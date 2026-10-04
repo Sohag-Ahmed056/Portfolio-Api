@@ -132,12 +132,16 @@ Authorization: Bearer <your-token>
 ## 📦 Scripts
 
 ```bash
-npm run dev       # Start dev server with nodemon
-npm run build     # Compile TypeScript
+npm run dev       # Start dev server with tsx watch
+npm run build     # Compile TypeScript into dist/
 npm start         # Start compiled JS server
 ```
 
----
+For production, run `npm run build` before `npm start`. Generated JavaScript stays
+in `dist/`, keeping `src/` for TypeScript source. The Prisma configuration remains
+in `prisma.config.ts`; Prisma loads it directly. Run `npm run seed:pdf` to regenerate
+the profile PDF and seed the knowledge base.
 
+---
 
 
