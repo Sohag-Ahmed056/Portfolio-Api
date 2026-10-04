@@ -1,12 +1,12 @@
 import { KnowledgeService } from './knowledge.service.js';
 import { aiConfig } from '../../../../config/ai.config.js';
-import type { IKnowledgeChunk } from '../ai.interface.js';
+import type { IChatMessage } from '../ai.interface.js';
 
 export class RetrievalService {
   /**
    * Find the most relevant chunks using simple keyword matching
    */
-  static async getRelevantChunks(question: string): Promise<string[]> {
+  static async getRelevantChunks(question: string, history: IChatMessage[] = []): Promise<string[]> {
     const chunks = await KnowledgeService.getAllChunks();
     
     if (chunks.length === 0) {
@@ -14,11 +14,12 @@ export class RetrievalService {
     }
 
     // Extract keywords from the question (basic tokenization)
-    const keywords = question
-      .toLowerCase()
-      .replace(/[^\w\s]/gi, '') // remove punctuation
-      .split(/\s+/)
-      .filter(word => word.length > 2); // ignore small words
+    const followUp = /\b(it|that|those|them|these|more|also|his|he)\b|আরও|সেটা|ওটা|তার/u.test(question.toLowerCase());
+    const previousQuestion = followUp ? history.findLast(message => message.role === 'user')?.content || '' : '';
+    const stopWords = new Set(['the', 'and', 'about', 'tell', 'what', 'does', 'how', 'can', 'you', 'his', 'with', 'that', 'more', 'sohag']);
+    const keywords = [...new Set((`${question} ${previousQuestion}`.toLowerCase()
+      .match(/[\p{L}\p{M}\p{N}]+/gu) || [])
+      .filter(word => word.length > 2 && !stopWords.has(word)))];
 
     if (keywords.length === 0) {
       // Fallback: if question doesn't have good keywords, just return a few random/first chunks
@@ -38,11 +39,7 @@ export class RetrievalService {
         }
         
         // Count occurrences in content
-        const regex = new RegExp(`\\b${keyword}\\b`, 'g');
-        const matches = contentLower.match(regex);
-        if (matches) {
-          score += matches.length;
-        }
+        score += contentLower.split(keyword).length - 1;
       });
 
       return { chunk, score };
